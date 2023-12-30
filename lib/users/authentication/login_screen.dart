@@ -1,5 +1,6 @@
 import 'package:clothes_store/project_settings/project_color.dart';
 import 'package:clothes_store/project_settings/project_text.dart';
+import 'package:clothes_store/users/authentication/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -37,12 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: Get.size.height * 0.03),
                       _buildLoginButton(),
                       SizedBox(height: Get.size.height * 0.03),
-                      InkWell(
-                        child: _registerText(),
-                        onTap: () {},
-                      )
                     ],
-                  ))
+                  )),
+              GestureDetector(
+                child: _registerText(),
+                onTap: () {
+                  Get.to(const RegisterScreen());
+                },
+              )
             ],
           ),
         ),
@@ -82,7 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
       elevation: 10,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(300), topRight: Radius.circular(50), bottomRight: Radius.circular(300)),
+            bottomLeft: Radius.circular(300),
+            topRight: Radius.circular(50),
+            bottomRight: Radius.circular(300)),
       ),
       child: Padding(
         padding: const EdgeInsets.only(left: 30),
@@ -116,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.only(left: 30),
         child: TextFormField(
           controller: usernameController,
-          validator: (value) => value == '' ? 'Lütfen Kullanıcı Adını Giriniz' : null,
+          validator: (value) =>
+              value == '' ? 'Lütfen Kullanıcı Adını Giriniz' : null,
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.email_outlined),
