@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:clothes_store/project_settings/project_text.dart';
+import 'package:clothes_store/services/api_service/api_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,6 +21,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   var userController = TextEditingController();
   var passwordController = TextEditingController();
   var emailController = TextEditingController();
+  validateEmail() async {
+    try {
+        var res = await http.post(Uri.parse(API.validateEmail),
+            body: {'user_email': emailController.text.trim()});
+        debugPrint("********* ${res.toString()}");
+        if (res.statusCode == 200) {
+          var resBody = jsonDecode(res.body);
+          print("********* $resBody");
+          if (resBody['success']) {
+            Fluttertoast.showToast(
+                msg: "E-mail başka biri tarafından kullanılıyor");
+          } else {
+            //register user
+          }
+        } else {
+          Fluttertoast.showToast(msg: "Bir hata oluştu");
+        }
+  
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,19 +64,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 Form(
+                    key: formkey,
                     child: Column(
-                  children: [
-                    SizedBox(height: Get.size.height * 0.03),
-                    _registerUserTextField(ProjectText.registerUserNameText),
-                    SizedBox(height: Get.size.height * 0.03),
-                    _registerMailTextField(ProjectText.registerMailText),
-                    SizedBox(height: Get.size.height * 0.03),
-                    _registerPasswordTextField(
-                        ProjectText.registerPasswordText),
-                    SizedBox(height: Get.size.height * 0.03),
-                    _buildRegisterButton(),
-                  ],
-                ))
+                      children: [
+                        SizedBox(height: Get.size.height * 0.03),
+                        _registerUserTextField(
+                            ProjectText.registerUserNameText),
+                        SizedBox(height: Get.size.height * 0.03),
+                        _registerMailTextField(ProjectText.registerMailText),
+                        SizedBox(height: Get.size.height * 0.03),
+                        _registerPasswordTextField(
+                            ProjectText.registerPasswordText),
+                        SizedBox(height: Get.size.height * 0.03),
+                        _buildRegisterButton(),
+                      ],
+                    ))
               ],
             ),
           ),
@@ -126,7 +157,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: TextFormField(
           controller: passwordController,
           validator: (value) => value == '' ? 'Lütfen Şifre Giriniz' : null,
-          textInputAction: TextInputAction.next,
+          textInputAction: TextInputAction.done,
+          obscureText: true,
           decoration: InputDecoration(
             prefixIcon: const Icon(Icons.vpn_key_outlined),
             border: InputBorder.none,
@@ -143,7 +175,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.blue,
       ),
       onPressed: () {
-        // Add login button pressed logic here
+        if (formkey.currentState!.validate()) {
+          validateEmail();
+        }
       },
       child: Text(
         ProjectText.loginButtonText,
